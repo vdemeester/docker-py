@@ -16,7 +16,7 @@ class BuildApiMixin(object):
     def build(self, path=None, tag=None, quiet=False, fileobj=None,
               nocache=False, rm=False, stream=False, timeout=None,
               custom_context=False, encoding=None, pull=False,
-              forcerm=False, dockerfile=None, container_limits=None,
+              forcerm=False, dockerfile=None, ignorefile='.dockerignore', container_limits=None,
               decode=False, buildargs=None, gzip=False, shmsize=None,
               labels=None):
         """
@@ -76,6 +76,7 @@ class BuildApiMixin(object):
             pull (bool): Downloads any updates to the FROM image in Dockerfiles
             forcerm (bool): Always remove intermediate containers, even after
                 unsuccessful builds
+            ignorefile (str): path within the build context to the docker ignore file
             dockerfile (str): path within the build context to the Dockerfile
             buildargs (dict): A dictionary of build arguments
             container_limits (dict): A dictionary of limits applied to each
@@ -130,7 +131,7 @@ class BuildApiMixin(object):
         elif not os.path.isdir(path):
             raise TypeError("You must specify a directory to build in path")
         else:
-            dockerignore = os.path.join(path, '.dockerignore')
+            dockerignore = os.path.join(path, ignorefile)
             exclude = None
             if os.path.exists(dockerignore):
                 with open(dockerignore, 'r') as f:
@@ -160,6 +161,7 @@ class BuildApiMixin(object):
             'rm': rm,
             'forcerm': forcerm,
             'pull': pull,
+            'ignorefile': ignorefile,
             'dockerfile': dockerfile,
         }
         params.update(container_limits)
